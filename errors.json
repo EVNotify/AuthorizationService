@@ -1,0 +1,14 @@
+{
+    "UNKNOWN_ROUTE": {
+        "code": 404,
+        "message": "Unknown route"
+    },
+    "UNPROCESSABLE_ENTITY": {
+        "code": 422,
+        "message": "Unprocessable entity"
+    },
+    "INTERNAL_ERROR": {
+        "code": 500,
+        "message": "Internal error"
+    }
+}

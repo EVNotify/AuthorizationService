@@ -1,0 +1,24 @@
+{
+  "name": "authorizationservice",
+  "version": "1.0.0",
+  "description": "Service to handle authorization of the API Backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EVNotify/AuthorizationService.git"
+  },
+  "author": "GPlay97",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "bugs": {
+    "url": "https://github.com/EVNotify/AuthorizationService/issues"
+  },
+  "homepage": "https://github.com/EVNotify/AuthorizationService#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "mongoose": "^5.6.10"
+  }
+}
