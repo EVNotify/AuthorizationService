@@ -9,6 +9,7 @@ const getKey = asyncHandler(async (req, res, next) => {
     }).select(['-_id']);
 
     if (!key) return next(errors.UNKNOWN_KEY);
+    if (key.hostname !== '*' && key.hostname !== req.hostname.toLowerCase()) return next(errors.FORBIDDEN);
     res.json(key);
 });
 
@@ -19,6 +20,7 @@ const useKey = asyncHandler(async (req, res, next) => {
     }).select(['usage', 'quota']);
 
     if (!key) return next(errors.UNKNOWN_KEY);
+    if (key.hostname !== '*' && key.hostname !== req.hostname.toLowerCase()) return next(errors.FORBIDDEN);
     // quota / usage
     if ((++key.usage || 0) > (key.quota || 0)) {
         res.setHeader('Retry-After', 10);
