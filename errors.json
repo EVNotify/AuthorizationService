@@ -10,5 +10,13 @@
     "INTERNAL_ERROR": {
         "code": 500,
         "message": "Internal error"
+    },
+    "MISSING_KEY": {
+        "code": 400,
+        "message": "No authorization key provided. Ensure that you specify one within Authorization header"
+    },
+    "UNKNOWN_KEY": {
+        "code": 404,
+        "message": "Authorization key invalid or not found. Ensure to send a Bearer Token within Authorization header"
     }
 }

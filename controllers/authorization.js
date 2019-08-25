@@ -1,10 +1,15 @@
 const asyncHandler = require('../utils/asyncHandler');
 const KeyModel = require('../models/Key');
+const errors = require('../errors.json');
 
 const getKey = asyncHandler(async (req, res, next) => {
-    res.json(await KeyModel.findOne({
+    if (!req.authKey) return next(errors.MISSING_KEY);
+    const key = await KeyModel.findOne({
         key: req.authKey
-    }).select(['-_id']));
+    }).select(['-_id']);
+
+    if (!key) return next(errors.UNKNOWN_KEY);
+    res.json(key);
 });
 
 const useKey = asyncHandler(async (req, res, next) => {

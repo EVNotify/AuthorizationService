@@ -6,6 +6,8 @@ const port = process.env.PORT || 3001;
 
 const authorizationRouter = require('./routes/authorization');
 
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+
 const app = express();
 
 // Cross-Origin-Resource-Sharing support
