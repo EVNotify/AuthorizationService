@@ -13,9 +13,28 @@ const getKey = asyncHandler(async (req, res, next) => {
 });
 
 const useKey = asyncHandler(async (req, res, next) => {
-    res.json(await KeyModel.create({
-        key: 'Test'
-    }));
+    if (!req.authKey) return next(errors.MISSING_KEY);
+    const key = await KeyModel.findOne({
+        key: req.authKey
+    }).select(['usage', 'quota']);
+
+    if (!key) return next(errors.UNKNOWN_KEY);
+    // quota / usage
+    if ((++key.usage || 0) > (key.quota || 0)) {
+        res.setHeader('Retry-After', 10);
+        return next(errors.QUOTA_EXCEEDED);
+    }
+    await KeyModel.updateOne({
+        key: req.authKey
+    }, {
+        $inc: {
+            usage: 1
+        }
+    });
+    res.json({
+        usage: key.usage,
+        quota: key.quota
+    });
 });
 
 module.exports = {

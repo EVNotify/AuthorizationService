@@ -11,8 +11,14 @@ const options = {
 const KeySchema = new mongoose.Schema({
     key: String,
     hostname: String,
-    quota: Number,
-    usage: Number,
+    quota: {
+        type: Number,
+        default: 0
+    },
+    usage: {
+        type: Number,
+        default: 0
+    },
     features: Array
 }, options);
  

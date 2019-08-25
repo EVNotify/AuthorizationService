@@ -18,5 +18,9 @@
     "UNKNOWN_KEY": {
         "code": 404,
         "message": "Authorization key invalid or not found. Ensure to send a Bearer Token within Authorization header"
+    },
+    "QUOTA_EXCEEDED": {
+        "code": 429,
+        "message": "Your quota exceeded"
     }
 }
