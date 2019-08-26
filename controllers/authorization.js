@@ -17,7 +17,7 @@ const useKey = asyncHandler(async (req, res, next) => {
     if (!req.authKey) return next(errors.MISSING_KEY);
     const key = await KeyModel.findOne({
         key: req.authKey
-    }).select(['usage', 'quota']);
+    }).select(['usage', 'quota', 'hostname']);
 
     if (!key) return next(errors.UNKNOWN_KEY);
     if (key.hostname !== '*' && key.hostname !== req.hostname.toLowerCase()) return next(errors.FORBIDDEN);
