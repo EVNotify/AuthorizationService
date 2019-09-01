@@ -4,7 +4,7 @@
   "description": "Service to handle authorization of the API Backend",
   "main": "index.js",
   "scripts": {
-    "test": "npm test"
+    "test": "./node_modules/mocha/bin/mocha tests/index.js --exit"
   },
   "repository": {
     "type": "git",
@@ -20,5 +20,10 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "mongoose": "^5.6.10"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "mocha": "^6.2.0"
   }
 }

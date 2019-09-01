@@ -46,12 +46,13 @@ app.use((err, req, res, next ) => {
     const status = parseInt(err.status || err.code) || 500;
 
     res.status(status >= 400 && status < 600 ? status : 422).json({
-        err: process.env.NODE_ENV === 'development' ? err : status === 500 ? errors.INTERNAL_ERROR.message : errors.UNPROCESSABLE_ENTITY.message
+        error: process.env.NODE_ENV === 'development' ? err : status === 500 ? errors.INTERNAL_ERROR.message : errors.UNPROCESSABLE_ENTITY.message
     });
 });
 
 require('./utils/db').connect().then(() => {
-    app.listen(port, () => console.log(`[HTTP] Server started on port ${port}`)); 
+    app.listen(port, () => console.log(`[HTTP] Server started on port ${port}`));
+    app.emit('server_ready');
 }).catch(() => {
     console.error('Database connection failed');
     process.exit(1);
