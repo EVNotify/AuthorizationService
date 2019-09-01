@@ -2,14 +2,18 @@ const mongoose = require('mongoose');
  
 const options = {
     id: false,
-    collection: 'authentication',
+    collection: 'authorization',
     timestamps: true,
     toObject: { getters: true },
     versionKey: false,
 };
  
 const KeySchema = new mongoose.Schema({
-    key: String,
+    key: {
+        type: String,
+        unique: true,
+        required: true
+    },
     hostname: String,
     quota: {
         type: Number,
