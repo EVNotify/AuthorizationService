@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const keyUtils = require('../utils/key');
+const keyUtils = require('@evnotify/utils').key;
 
 const authorizationController = require('../controllers/authorization');
 

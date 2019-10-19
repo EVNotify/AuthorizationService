@@ -1,6 +1,9 @@
 const cors = require('cors');
 const express = require('express');
 
+const db = require('@evnotify/utils').db;
+// const db = require('./utils/db');
+
 const errors = require('./errors.json');
 const port = process.env.PORT || 3001;
 
@@ -50,7 +53,7 @@ app.use((err, req, res, next ) => {
     });
 });
 
-require('./utils/db').connect().then(() => {
+db.connect().then(() => {
     app.listen(port, () => console.log(`[HTTP] Server started on port ${port}`));
     app.emit('server_ready');
 }).catch(() => {

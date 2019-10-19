@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const connection = require('@evnotify/utils').db.getDB();
  
 const options = {
     id: false,
@@ -26,4 +27,4 @@ const KeySchema = new mongoose.Schema({
     features: Array
 }, options);
  
-module.exports = mongoose.model('Key', KeySchema);
+module.exports = connection.model('Key', KeySchema);

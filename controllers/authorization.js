@@ -1,4 +1,4 @@
-const asyncHandler = require('../utils/asyncHandler');
+const asyncHandler = require('@evnotify/utils').asyncHandler;
 const KeyModel = require('../models/Key');
 const errors = require('../errors.json');
 
