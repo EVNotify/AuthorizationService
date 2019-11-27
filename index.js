@@ -2,7 +2,7 @@ const cors = require('cors');
 const express = require('express');
 
 const db = require('@evnotify/utils').db;
-// const db = require('./utils/db');
+const errorHandler = require('@evnotify/middlewares').errorHandler;
 
 const errors = require('./errors.json');
 const port = process.env.PORT || 3001;
@@ -40,18 +40,7 @@ app.use('/authorization', authorizationRouter);
 app.use((_req, _res, next) => next(errors.UNKNOWN_ROUTE));
 
 // error handling
-app.use((err, req, res, next ) => {
-    if (!err) err = new Error();
-
-    console.error('An error occurred on ' + req.method + ' ' + req.url, err);
-
-    if (res.headersSent) return next(err);
-    const status = parseInt(err.status || err.code) || 500;
-
-    res.status(status >= 400 && status < 600 ? status : 422).json({
-        error: process.env.NODE_ENV === 'development' ? err : status === 500 ? errors.INTERNAL_ERROR.message : errors.UNPROCESSABLE_ENTITY.message
-    });
-});
+app.use(errorHandler);
 
 db.connect().then(() => {
     app.listen(port, () => console.log(`[HTTP] Server started on port ${port}`));
