@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const connection = require('@evnotify/utils').db.getDB();
  
+const FeatureSchema = require('./Feature');
+
 const options = {
     id: false,
     collection: 'authorization',
@@ -24,7 +26,7 @@ const KeySchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    features: Array
+    features: [FeatureSchema]
 }, options);
- 
+
 module.exports = connection.model('Key', KeySchema);
