@@ -28,44 +28,29 @@ const useKey = asyncHandler(async (req, res, next) => {
     // check if dynamic URL parameters have been passed to the parsed request URL
     if (req.body.referer.params != null && typeof req.body.referer.params === 'object' && Object.keys(req.body.referer.params).length) {
         if (!(features.some((feature) => {
-            let isValid = false;
-            const originalParts = req.body.referer.path.split('/');
-            const featureParts = feature.path.split('/');
+            const validParts = [];
+            const originalParts = req.body.referer.path.split('/').filter((part) => part);
+            const featureParts = feature.path.split('/').filter((part) => part);
+            const originalParamKeys = Object.keys(req.body.referer.params);
 
-            /*
-            Experimental new way to check
-            GET /users/Max/log/123
+            // ensure that url and parameters parts are equal
+            if (originalParts.length !== featureParts.length) return next(errors.FORBIDDEN);
+            if (originalParamKeys.length !== featureParts.filter((part) => part.startsWith(':')).length) return next(errors.FORBIDDEN);
 
-            (GET /users/:username/log/:id)
-
-            GET /users/:username/station/:id
-            */
             originalParts.forEach((originalPart, currentIdX) => {
                 const featurePart = featureParts[currentIdX];
 
                 if (featurePart) {
+                    // check if the part is equal, if not, check if it is the same, but as the correct dynamic parameter
                     if (featurePart === originalPart) {
-                        // good
-                    } else if (featurePart.includes(':') && Object.keys(req.body.referer.params).includes(featurePart.substr(1)) && req.body.referer.params[featurePart.substr(1)] === originalPart) {
-                        // good
+                        validParts.push(featurePart);
+                    } else if (featurePart.includes(':') && originalParamKeys.includes(featurePart.substr(1)) && req.body.referer.params[featurePart.substr(1)] === originalPart) {
+                        validParts.push(featurePart);
                     }
                 }
             });
 
-            /**
-                GET /users/:username/log/:id
-
-                GET /users/:username/station/:id
-
-                This check works for parameters check, but does not care about the rest (critical!)
-             */
-            
-            // // ensure that path includes dynamic parameter identifier
-            // if (feature.path.includes(':')) {
-            //     // ensure that every dynamic parameter is used in our request
-            //     return Object.keys(req.body.referer.params).every((key) => feature.path.includes(`/:${key}`));
-            // }
-            return isValid;
+            return validParts.length === originalParts.length;
         }))) return next(errors.FORBIDDEN);
     } else {
         // check if feature is allowed
