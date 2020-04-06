@@ -28,6 +28,7 @@ const useKey = asyncHandler(async (req, res, next) => {
     // check if dynamic URL parameters have been passed to the parsed request URL
     if (req.body.referer.params != null && typeof req.body.referer.params === 'object' && Object.keys(req.body.referer.params).length) {
         if (!(features.some((feature) => {
+            if (feature.method !== req.body.referer.method) return;
             const validParts = [];
             const originalParts = req.body.referer.path.split('/').filter((part) => part);
             const featureParts = feature.path.split('/').filter((part) => part);
