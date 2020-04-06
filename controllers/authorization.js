@@ -35,8 +35,8 @@ const useKey = asyncHandler(async (req, res, next) => {
             const originalParamKeys = Object.keys(req.body.referer.params);
 
             // ensure that url and parameters parts are equal
-            if (originalParts.length !== featureParts.length) return next(errors.FORBIDDEN);
-            if (originalParamKeys.length !== featureParts.filter((part) => part.startsWith(':')).length) return next(errors.FORBIDDEN);
+            if (originalParts.length !== featureParts.length) return;
+            if (originalParamKeys.length !== featureParts.filter((part) => part.startsWith(':')).length) return;
 
             originalParts.forEach((originalPart, currentIdX) => {
                 const featurePart = featureParts[currentIdX];
