@@ -7,8 +7,8 @@ module.exports = {
     max_restarts: 10,
     watch: true,
     env: {
-      DB_USER: '',
-      DB_PASSWORD: '',
+      DB_USER: 'admin',
+      DB_PASSWORD: 'admin',
       DB_HOST: 'localhost',
       DB_PORT: '27017',
       DB_NAME: 'evnotify'

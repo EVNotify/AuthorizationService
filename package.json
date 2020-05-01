@@ -4,7 +4,8 @@
   "description": "Service to handle authorization of the API Backend",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha tests/index.js --exit"
+    "test": "./node_modules/mocha/bin/mocha tests/index.js --exit",
+    "doc": "./node_modules/apidoc/bin/apidoc -i routes/ -o doc"
   },
   "repository": {
     "type": "git",
@@ -19,6 +20,7 @@
   "dependencies": {
     "@evnotify/middlewares": "^1.0.4",
     "@evnotify/utils": "^1.0.4",
+    "apidoc": "^0.22.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "mongoose": "^5.6.10"

@@ -11,3 +11,7 @@ app.use('/', pingAuthorization, pingAuthentification, myFunction);
     "DB_PORT": "27017",
     "DB_NAME": "evnotify"
 }
+
+```
+DB_USER="admin" DB_PASSWORD="admin" DB_HOST="localhost" DB_PORT="27017" DB_NAME="evnotify" ./node_modules/mocha/bin/mocha tests/* --timeout 999999 --exit
+```
