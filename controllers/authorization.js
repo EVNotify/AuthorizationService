@@ -5,7 +5,7 @@ const errors = require('../errors.json');
 const defaultFeatures = require('../utils/feature').defaultFeatures();
 
 const createKey = asyncHandler(async (req, res, next) => {
-    if (typeof req.body.scopes !== 'string' || !req.body.scopes.every((scope) => typeof scope === 'string' && scope.length === 6)) return next(errors.INVALID_SCOPES);
+    if (!Array.isArray(req.body.scopes) || !req.body.scopes.every((scope) => typeof scope === 'string' && scope.length === 6)) return next(errors.INVALID_SCOPES);
 
     res.json(await KeyModel.create({
         key: crypto.randomBytes(8).toString('hex'),

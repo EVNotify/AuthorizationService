@@ -26,5 +26,9 @@
     "QUOTA_EXCEEDED": {
         "code": 429,
         "message": "Your quota exceeded"
+    },
+    "INVALID_SCOPES": {
+        "code": 400,
+        "message": "Ensure to provide valid AKeys to define scope"
     }
 }
