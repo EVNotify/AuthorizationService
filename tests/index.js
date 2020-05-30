@@ -20,6 +20,18 @@ before((done) => {
         await keyModel.deleteOne({
             key: 'Test3'
         });
+        await keyModel.deleteOne({
+            key: 'Test4'
+        });
+        await keyModel.deleteOne({
+            key: 'Test5'
+        });
+        await keyModel.deleteOne({
+            key: 'Test6'
+        });
+        await keyModel.deleteOne({
+            key: 'Test7'
+        });
         await keyModel.create({
             key: 'Test1',
             hostname: '127.0.0.1',
@@ -28,11 +40,33 @@ before((done) => {
         await keyModel.create({
             key: 'Test2',
             hostname: '*',
+            features: [{
+                method: 'GET',
+                path: '/something'
+            }],
             quota: 1
         });
         await keyModel.create({
             key: 'Test3',
             hostname: 'example.com',
+            quota: 1
+        });
+        await keyModel.create({
+            key: 'Test4',
+            hostname: '127.0.0.1',
+            features: [{
+                method: 'POST',
+                path: '/authorization'
+            }],
+            quota: 1
+        });
+        await keyModel.create({
+            key: 'Test5',
+            hostname: '*',
+            features: [{
+                method: 'GET',
+                path: '/authorization'
+            }],
             quota: 1
         });
         done();
@@ -155,10 +189,34 @@ describe('Authorization', () => {
                     done();
                 });
         });
-        it('Requesting with valid local key should return info', (done) => {
+        it('Requesting with valid local key but no features should return forbidden', (done) => {
             chai.request(server)
                 .post('/authorization')
                 .set('Authorization', 'Bearer Test1')
+                .end((err, response) => {
+                    should.not.exist(err);
+                    should.exist(response);
+                    response.should.have.status(403);
+                    response.body.should.have.property('error').eql(errors.FORBIDDEN);
+                    done();
+                });
+        });
+        it('Requesting with valid local key and non relevant feature should return forbidden', (done) => {
+            chai.request(server)
+                .post('/authorization')
+                .set('Authorization', 'Bearer Test2')
+                .end((err, response) => {
+                    should.not.exist(err);
+                    should.exist(response);
+                    response.should.have.status(403);
+                    response.body.should.have.property('error').eql(errors.FORBIDDEN);
+                    done();
+                });
+        });
+        it('Requesting with valid local key and feature but missing referrer should return forbidden', (done) => {
+            chai.request(server)
+                .post('/authorization')
+                .set('Authorization', 'Bearer Test4')
                 .end((err, response) => {
                     should.not.exist(err);
                     should.exist(response);

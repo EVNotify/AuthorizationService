@@ -26,6 +26,10 @@ const KeySchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    scopes: [{
+        type: String,
+        required: true
+    }],
     features: [FeatureSchema]
 }, options);
 

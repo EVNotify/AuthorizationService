@@ -1,6 +1,20 @@
+const crypto = require('crypto');
 const asyncHandler = require('@evnotify/utils').asyncHandler;
 const KeyModel = require('../models/Key');
 const errors = require('../errors.json');
+const defaultFeatures = require('../utils/feature').defaultFeatures();
+
+const createKey = asyncHandler(async (req, res, next) => {
+    if (typeof req.body.scopes !== 'string' || !req.body.scopes.every((scope) => typeof scope === 'string' && scope.length === 6)) return next(errors.INVALID_SCOPES);
+
+    res.json(await KeyModel.create({
+        key: crypto.randomBytes(8).toString('hex'),
+        hostname: 'evnotify.de',
+        quota: 10000,
+        scopes: req.body.scopes,
+        features: defaultFeatures
+    }));
+});
 
 const getKey = asyncHandler(async (req, res, next) => {
     if (!req.authKey) return next(errors.MISSING_KEY);
@@ -78,5 +92,6 @@ const useKey = asyncHandler(async (req, res, next) => {
 
 module.exports = {
     getKey,
+    createKey,
     useKey
 };

@@ -6,7 +6,7 @@ const keyUtils = require('@evnotify/utils').key;
 const authorizationController = require('../controllers/authorization');
 
 const attachKey = (req, _res, next) => {
-    req.authKey = keyUtils.extractKey(req);
+    req.authKey = req.params.key || keyUtils.extractKey(req);
     next();
 };
 
@@ -32,6 +32,7 @@ const attachKey = (req, _res, next) => {
  *  }
  */
 router.get('/', attachKey, authorizationController.getKey);
-router.post('/', attachKey, authorizationController.useKey);
+router.post('/', authorizationController.createKey);
+router.post('/:key', attachKey, authorizationController.useKey);
 
 module.exports = router;
