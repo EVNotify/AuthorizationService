@@ -16,7 +16,7 @@ const createKey = asyncHandler(async (req, res, next) => {
         scopes: req.body.scopes,
         features: defaultFeatures
     });
-    
+
     res.json(await KeyModel.findOne({
         key: randomKey
     }).select('-_id -createdAt -updatedAt'));
@@ -37,14 +37,16 @@ const useKey = asyncHandler(async (req, res, next) => {
     if (!req.authKey) return next(errors.MISSING_KEY);
     const key = await KeyModel.findOne({
         key: req.authKey
-    }).select(['usage', 'quota', 'hostname', 'features']);
+    }).select(['usage', 'quota', 'hostname', 'features', 'scopes']);
 
     if (!key) return next(errors.UNKNOWN_KEY);
     if (key.hostname !== '*' && key.hostname !== req.hostname.toLowerCase()) return next(errors.FORBIDDEN);
     
     const features = Array.isArray(key.features) ? key.features : [];
+    const scopes = Array.isArray(key.scopes) ? key.scopes : [];
 
-    if (req.body.referer == null || typeof req.body.referer.method !== 'string' || typeof req.body.referer.path !== 'string') return next(errors.FORBIDDEN);
+    if (req.body.referer == null || typeof req.body.referer.method !== 'string' || typeof req.body.referer.path !== 'string' || typeof req.body.referer.akey !== 'string') return next(errors.FORBIDDEN);
+    if (!scopes.includes(req.body.referer.akey)) return next(errors.FORBIDDEN);
     // check if dynamic URL parameters have been passed to the parsed request URL
     if (req.body.referer.params != null && typeof req.body.referer.params === 'object' && Object.keys(req.body.referer.params).length) {
         if (!(features.some((feature) => {
