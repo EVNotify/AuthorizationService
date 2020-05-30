@@ -7,13 +7,19 @@ const defaultFeatures = require('../utils/feature').defaultFeatures();
 const createKey = asyncHandler(async (req, res, next) => {
     if (!Array.isArray(req.body.scopes) || !req.body.scopes.every((scope) => typeof scope === 'string' && scope.length === 6)) return next(errors.INVALID_SCOPES);
 
-    res.json(await KeyModel.create({
-        key: crypto.randomBytes(8).toString('hex'),
+    const randomKey = crypto.randomBytes(8).toString('hex');
+
+    await KeyModel.create({
+        key: randomKey,
         hostname: 'evnotify.de',
         quota: 10000,
         scopes: req.body.scopes,
         features: defaultFeatures
-    }));
+    });
+    
+    res.json(await KeyModel.findOne({
+        key: randomKey
+    }).select('-_id -createdAt -updatedAt'));
 });
 
 const getKey = asyncHandler(async (req, res, next) => {
