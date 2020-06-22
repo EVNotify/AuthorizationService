@@ -86,21 +86,20 @@ describe('Authorization', () => {
                     done();
                 });
         });
-        it('Requesting without key should fail', (done) => {
+        it('Requesting without key should fail due to missing route', (done) => {
             chai.request(server)
                 .get('/authorization')
                 .end((err, response) => {
                     should.not.exist(err);
                     should.exist(response);
-                    response.should.have.status(400);
-                    response.body.should.have.property('error').eql(errors.MISSING_KEY);
+                    response.should.have.status(404);
+                    response.body.should.have.property('error').eql(errors.UNKNOWN_ROUTE);
                     done();
                 });
         });
         it('Requesting with non-existing key should fail', (done) => {
             chai.request(server)
-                .get('/authorization')
-                .set('Authorization', 'Bearer 1234')
+                .get('/authorization/1234')
                 .end((err, response) => {
                     should.not.exist(err);
                     should.exist(response);
@@ -111,8 +110,7 @@ describe('Authorization', () => {
         });
         it('Requesting with valid local key should return info', (done) => {
             chai.request(server)
-                .get('/authorization')
-                .set('Authorization', 'Bearer Test1')
+                .get('/authorization/Test1')
                 .end((err, response) => {
                     should.not.exist(err);
                     should.exist(response);
@@ -127,8 +125,22 @@ describe('Authorization', () => {
         });
         it('Requesting with valid wildcard key should return info', (done) => {
             chai.request(server)
-                .get('/authorization')
-                .set('Authorization', 'Bearer Test2')
+                .get('/authorization/Test2')
+                .end((err, response) => {
+                    should.not.exist(err);
+                    should.exist(response);
+                    response.should.have.status(200);
+                    response.body.should.not.have.property('id');
+                    response.body.should.have.property('key').eql('Test2');
+                    response.body.should.have.property('quota').eql(1);
+                    response.body.should.have.property('usage').eql(0);
+                    response.body.should.have.property('hostname').eql('*');
+                    done();
+                });
+        });
+        it('Requesting info again should not increase usage', (done) => {
+            chai.request(server)
+                .get('/authorization/Test2')
                 .end((err, response) => {
                     should.not.exist(err);
                     should.exist(response);
@@ -143,8 +155,7 @@ describe('Authorization', () => {
         });
         it('Requesting with different hostname key should not return info', (done) => {
             chai.request(server)
-                .get('/authorization')
-                .set('Authorization', 'Bearer Test3')
+                .get('/authorization/Test3')
                 .end((err, response) => {
                     should.not.exist(err);
                     should.exist(response);
@@ -155,171 +166,203 @@ describe('Authorization', () => {
         });
     });
     describe('POST', () => {
-        it('Requesting non-existing route should fail', (done) => {
-            chai.request(server)
-                .post('/')
-                .end((err, response) => {
-                    should.not.exist(err);
-                    should.exist(response);
-                    response.should.have.status(404);
-                    response.body.should.have.property('error').eql(errors.UNKNOWN_ROUTE);
-                    done();
-                });
-        });
-        it('Requesting without key should fail', (done) => {
+        it('Requesting creation of new key without scope should fail', (done) => {
             chai.request(server)
                 .post('/authorization')
                 .end((err, response) => {
                     should.not.exist(err);
                     should.exist(response);
                     response.should.have.status(400);
-                    response.body.should.have.property('error').eql(errors.MISSING_KEY);
+                    response.body.should.have.property('error').eql(errors.INVALID_SCOPES);
                     done();
                 });
         });
-        it('Requesting with non-existing key should fail', (done) => {
+        it('Requesting creation of new key with invalid scope should fail', (done) => {
             chai.request(server)
                 .post('/authorization')
-                .set('Authorization', 'Bearer 1234')
+                .send({
+                    scopes: ['invalid']
+                })
                 .end((err, response) => {
                     should.not.exist(err);
                     should.exist(response);
-                    response.should.have.status(404);
-                    response.body.should.have.property('error').eql(errors.UNKNOWN_KEY);
+                    response.should.have.status(400);
+                    response.body.should.have.property('error').eql(errors.INVALID_SCOPES);
                     done();
                 });
         });
-        it('Requesting with valid local key but no features should return forbidden', (done) => {
+        it('Requesting creation of new key with invalid scope should fail', (done) => {
             chai.request(server)
                 .post('/authorization')
-                .set('Authorization', 'Bearer Test1')
+                .send({
+                    scopes: ['invalid']
+                })
                 .end((err, response) => {
                     should.not.exist(err);
                     should.exist(response);
-                    response.should.have.status(403);
-                    response.body.should.have.property('error').eql(errors.FORBIDDEN);
+                    response.should.have.status(400);
+                    response.body.should.have.property('error').eql(errors.INVALID_SCOPES);
                     done();
                 });
         });
-        it('Requesting with valid local key and non relevant feature should return forbidden', (done) => {
+        it('Requesting creation of new key with invalid scope should fail', (done) => {
             chai.request(server)
                 .post('/authorization')
-                .set('Authorization', 'Bearer Test2')
-                .end((err, response) => {
-                    should.not.exist(err);
-                    should.exist(response);
-                    response.should.have.status(403);
-                    response.body.should.have.property('error').eql(errors.FORBIDDEN);
-                    done();
-                });
-        });
-        it('Requesting with valid local key and feature but missing referrer should return forbidden', (done) => {
-            chai.request(server)
-                .post('/authorization')
-                .set('Authorization', 'Bearer Test4')
+                .send({
+                    scopes: ['123456']
+                })
                 .end((err, response) => {
                     should.not.exist(err);
                     should.exist(response);
                     response.should.have.status(200);
-                    response.body.should.not.have.property('id');
-                    response.body.should.have.property('quota').eql(1);
-                    response.body.should.have.property('usage').eql(1);
+                    console.log(response.body);
+                    response.body.should.have.property('key').to.be.a('string').to.have.lengthOf(16);
                     done();
                 });
         });
-        it('Requesting with valid wildcard key should return info', (done) => {
-            chai.request(server)
-                .post('/authorization')
-                .set('Authorization', 'Bearer Test2')
-                .end((err, response) => {
-                    should.not.exist(err);
-                    should.exist(response);
-                    response.should.have.status(200);
-                    response.body.should.not.have.property('id');
-                    response.body.should.have.property('quota').eql(1);
-                    response.body.should.have.property('usage').eql(1);
-                    done();
-                });
-        });
-        it('Requesting with different hostname key should not return info', (done) => {
-            chai.request(server)
-                .get('/authorization')
-                .set('Authorization', 'Bearer Test3')
-                .end((err, response) => {
-                    should.not.exist(err);
-                    should.exist(response);
-                    response.should.have.status(403);
-                    response.body.should.have.property('error').eql(errors.FORBIDDEN);
-                    done();
-                });
-        });
-        it('Re-checking local key should include decreased usage', (done) => {
-            chai.request(server)
-                .get('/authorization')
-                .set('Authorization', 'Bearer Test1')
-                .end((err, response) => {
-                    should.not.exist(err);
-                    should.exist(response);
-                    response.should.have.status(200);
-                    response.body.should.not.have.property('id');
-                    response.body.should.have.property('key').eql('Test1');
-                    response.body.should.have.property('quota').eql(1);
-                    response.body.should.have.property('usage').eql(1);
-                    response.body.should.have.property('hostname').eql('127.0.0.1');
-                    done();
-                });
-        });
-        it('Re-checking wildcard key should include decreased usage', (done) => {
-            chai.request(server)
-                .get('/authorization')
-                .set('Authorization', 'Bearer Test2')
-                .end((err, response) => {
-                    should.not.exist(err);
-                    should.exist(response);
-                    response.should.have.status(200);
-                    response.body.should.not.have.property('id');
-                    response.body.should.have.property('key').eql('Test2');
-                    response.body.should.have.property('quota').eql(1);
-                    response.body.should.have.property('usage').eql(1);
-                    response.body.should.have.property('hostname').eql('*');
-                    done();
-                });
-        });
-        it('Re-checking different hostname key should include decreased usage', (done) => {
-            chai.request(server)
-                .get('/authorization')
-                .set('Authorization', 'Bearer Test3')
-                .end((err, response) => {
-                    should.not.exist(err);
-                    should.exist(response);
-                    response.should.have.status(403);
-                    response.body.should.have.property('error').eql(errors.FORBIDDEN);
-                    done();
-                });
-        });
-        it('Requesting with valid local key but exceeded quota should not return info', (done) => {
-            chai.request(server)
-                .post('/authorization')
-                .set('Authorization', 'Bearer Test1')
-                .end((err, response) => {
-                    should.not.exist(err);
-                    should.exist(response);
-                    response.should.have.status(429);
-                    response.body.should.have.property('error').eql(errors.QUOTA_EXCEEDED);
-                    done();
-                });
-        });
-        it('Requesting with valid wildcard key but exceeded quota should not return info', (done) => {
-            chai.request(server)
-                .post('/authorization')
-                .set('Authorization', 'Bearer Test2')
-                .end((err, response) => {
-                    should.not.exist(err);
-                    should.exist(response);
-                    response.should.have.status(429);
-                    response.body.should.have.property('error').eql(errors.QUOTA_EXCEEDED);
-                    done();
-                });
-        });
+        // it('Requesting with non-existing key should fail', (done) => {
+        //     chai.request(server)
+        //         .post('/authorization')
+        //         .set('Authorization', 'Bearer 1234')
+        //         .end((err, response) => {
+        //             should.not.exist(err);
+        //             should.exist(response);
+        //             response.should.have.status(404);
+        //             response.body.should.have.property('error').eql(errors.UNKNOWN_KEY);
+        //             done();
+        //         });
+        // });
+        // it('Requesting with valid local key but no features should return forbidden', (done) => {
+        //     chai.request(server)
+        //         .post('/authorization')
+        //         .set('Authorization', 'Bearer Test1')
+        //         .end((err, response) => {
+        //             should.not.exist(err);
+        //             should.exist(response);
+        //             response.should.have.status(403);
+        //             response.body.should.have.property('error').eql(errors.FORBIDDEN);
+        //             done();
+        //         });
+        // });
+        // it('Requesting with valid local key and non relevant feature should return forbidden', (done) => {
+        //     chai.request(server)
+        //         .post('/authorization')
+        //         .set('Authorization', 'Bearer Test2')
+        //         .end((err, response) => {
+        //             should.not.exist(err);
+        //             should.exist(response);
+        //             response.should.have.status(403);
+        //             response.body.should.have.property('error').eql(errors.FORBIDDEN);
+        //             done();
+        //         });
+        // });
+        // it('Requesting with valid local key and feature but missing referrer should return forbidden', (done) => {
+        //     chai.request(server)
+        //         .post('/authorization')
+        //         .set('Authorization', 'Bearer Test4')
+        //         .end((err, response) => {
+        //             should.not.exist(err);
+        //             should.exist(response);
+        //             response.should.have.status(200);
+        //             response.body.should.not.have.property('id');
+        //             response.body.should.have.property('quota').eql(1);
+        //             response.body.should.have.property('usage').eql(1);
+        //             done();
+        //         });
+        // });
+        // it('Requesting with valid wildcard key should return info', (done) => {
+        //     chai.request(server)
+        //         .post('/authorization')
+        //         .set('Authorization', 'Bearer Test2')
+        //         .end((err, response) => {
+        //             should.not.exist(err);
+        //             should.exist(response);
+        //             response.should.have.status(200);
+        //             response.body.should.not.have.property('id');
+        //             response.body.should.have.property('quota').eql(1);
+        //             response.body.should.have.property('usage').eql(1);
+        //             done();
+        //         });
+        // });
+        // it('Requesting with different hostname key should not return info', (done) => {
+        //     chai.request(server)
+        //         .get('/authorization')
+        //         .set('Authorization', 'Bearer Test3')
+        //         .end((err, response) => {
+        //             should.not.exist(err);
+        //             should.exist(response);
+        //             response.should.have.status(403);
+        //             response.body.should.have.property('error').eql(errors.FORBIDDEN);
+        //             done();
+        //         });
+        // });
+        // it('Re-checking local key should include decreased usage', (done) => {
+        //     chai.request(server)
+        //         .get('/authorization')
+        //         .set('Authorization', 'Bearer Test1')
+        //         .end((err, response) => {
+        //             should.not.exist(err);
+        //             should.exist(response);
+        //             response.should.have.status(200);
+        //             response.body.should.not.have.property('id');
+        //             response.body.should.have.property('key').eql('Test1');
+        //             response.body.should.have.property('quota').eql(1);
+        //             response.body.should.have.property('usage').eql(1);
+        //             response.body.should.have.property('hostname').eql('127.0.0.1');
+        //             done();
+        //         });
+        // });
+        // it('Re-checking wildcard key should include decreased usage', (done) => {
+        //     chai.request(server)
+        //         .get('/authorization')
+        //         .set('Authorization', 'Bearer Test2')
+        //         .end((err, response) => {
+        //             should.not.exist(err);
+        //             should.exist(response);
+        //             response.should.have.status(200);
+        //             response.body.should.not.have.property('id');
+        //             response.body.should.have.property('key').eql('Test2');
+        //             response.body.should.have.property('quota').eql(1);
+        //             response.body.should.have.property('usage').eql(1);
+        //             response.body.should.have.property('hostname').eql('*');
+        //             done();
+        //         });
+        // });
+        // it('Re-checking different hostname key should include decreased usage', (done) => {
+        //     chai.request(server)
+        //         .get('/authorization')
+        //         .set('Authorization', 'Bearer Test3')
+        //         .end((err, response) => {
+        //             should.not.exist(err);
+        //             should.exist(response);
+        //             response.should.have.status(403);
+        //             response.body.should.have.property('error').eql(errors.FORBIDDEN);
+        //             done();
+        //         });
+        // });
+        // it('Requesting with valid local key but exceeded quota should not return info', (done) => {
+        //     chai.request(server)
+        //         .post('/authorization')
+        //         .set('Authorization', 'Bearer Test1')
+        //         .end((err, response) => {
+        //             should.not.exist(err);
+        //             should.exist(response);
+        //             response.should.have.status(429);
+        //             response.body.should.have.property('error').eql(errors.QUOTA_EXCEEDED);
+        //             done();
+        //         });
+        // });
+        // it('Requesting with valid wildcard key but exceeded quota should not return info', (done) => {
+        //     chai.request(server)
+        //         .post('/authorization')
+        //         .set('Authorization', 'Bearer Test2')
+        //         .end((err, response) => {
+        //             should.not.exist(err);
+        //             should.exist(response);
+        //             response.should.have.status(429);
+        //             response.body.should.have.property('error').eql(errors.QUOTA_EXCEEDED);
+        //             done();
+        //         });
+        // });
     });
 });
