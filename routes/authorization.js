@@ -31,7 +31,7 @@ const attachKey = (req, _res, next) => {
  *      "hostname": "example.com"
  *  }
  */
-router.get('/', attachKey, authorizationController.getKey);
+router.get('/:key', attachKey, authorizationController.getKey);
 router.post('/', attachKey, authorizationController.createKey);
 router.post('/:key', attachKey, authorizationController.useKey);
 

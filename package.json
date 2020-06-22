@@ -4,7 +4,7 @@
   "description": "Service to handle authorization of the API Backend",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha tests/index.js --exit",
+    "test": "./node_modules/mocha/bin/mocha tests/index.js --exit --timeout 99999",
     "doc": "./node_modules/apidoc/bin/apidoc -i routes/ -o doc"
   },
   "repository": {
