@@ -32,7 +32,7 @@ const attachKey = (req, _res, next) => {
  *  }
  */
 router.get('/', attachKey, authorizationController.getKey);
-router.post('/', authorizationController.createKey);
+router.post('/', attachKey, authorizationController.createKey);
 router.post('/:key', attachKey, authorizationController.useKey);
 
 module.exports = router;
