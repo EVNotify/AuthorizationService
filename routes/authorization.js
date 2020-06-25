@@ -11,24 +11,41 @@ const attachKey = (req, _res, next) => {
 };
 
 /**
- * @api {get} /authorization Retrieve information about current authorization
- * @apiName GetAuthorization
+ * @api {get} /authorization/:key Retrieve authorization information
+ * @apiName GetAuthorizationKey
  * @apiGroup Authorization
  * 
- * @apiHeader {String} authorization The authorization key as a Bearer Token
+ * @apiDescription In order to be able to communicate with the API you need a valid API key.
+ * With this request you can retrieve information about your API key such as your current usage and quota.
+ * 
+ * @apiParam {String} key The API Key that is used for authorization
  * 
  * @apiSuccess {String} key The authorization key
  * @apiSuccess {Number} quota The amount of requests allowed in a month
  * @apiSuccess {Number} usage The amount of already used quota
- * @apiSuccess {String} hostname The hostname where key is valid for
+ * @apiSuccess {String} hostname The hostname where key is valid for (* for no limitation)
+ * @apiSuccess {String[]} scopes List of AKeys where the API key can be used for
+ * @apiSuccess {Object[]} features List of features from HTTP routes / actions where the API key can be used for
  * 
- * @apiSuccessExample Success-Response:
+ * @apiSuccessExample Authorization key information
  *  HTTP/1.1 200 OK
  *  {
  *      "key": "TestKey",
  *      "quota": "100",
  *      "usage": "12",
- *      "hostname": "example.com"
+ *      "hostname": "example.com",
+ *      "scopes": ["123456"],
+ *      "features": [{
+ *          method: 'GET',
+ *          path: '/some/action'
+ *      }]
+ *  }
+ * 
+ * @apiErrorExample {json} Key not found
+ *  HTTP/1.1 404 Not Found
+ *  {
+ *      "code": 404,
+        "message": "Authorization key invalid or not found. Ensure to send a Bearer Token within Authorization header or within URL if applicable"
  *  }
  */
 router.get('/:key', attachKey, authorizationController.getKey);

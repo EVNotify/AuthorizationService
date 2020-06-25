@@ -13,11 +13,11 @@
     },
     "MISSING_KEY": {
         "code": 400,
-        "message": "No authorization key provided. Ensure that you specify one within Authorization header"
+        "message": "No authorization key provided. Ensure that you specify one within Authorization header or within URL if applicable"
     },
     "UNKNOWN_KEY": {
         "code": 404,
-        "message": "Authorization key invalid or not found. Ensure to send a Bearer Token within Authorization header"
+        "message": "Authorization key invalid or not found. Ensure to send a Bearer Token within Authorization header or within URL if applicable"
     },
     "FORBIDDEN": {
         "code": 403,
