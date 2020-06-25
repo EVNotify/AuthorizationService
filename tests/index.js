@@ -169,6 +169,7 @@ describe('Authorization', () => {
         });
     });
     describe('POST', () => {
+        // POST /
         it('Requesting creation of new key without scope should fail', (done) => {
             chai.request(server)
                 .post('/authorization')
@@ -240,6 +241,29 @@ describe('Authorization', () => {
                     response.body.should.have.property('quota').eql(10000);
                     response.body.should.have.property('usage').eql(0);
                     response.body.should.have.property('hostname').eql('*');
+                    done();
+                });
+        });
+        // POST /:key
+        it('Use key with non-existing key should fail', (done) => {
+            chai.request(server)
+                .post(`/authorization/nonexisting`)
+                .end((err, response) => {
+                    should.not.exist(err);
+                    should.exist(response);
+                    response.should.have.status(404);
+                    response.body.should.have.property('error').eql(errors.UNKNOWN_KEY);
+                    done();
+                });
+        });
+        it('Use key with valid key but invalid hostname should fail', (done) => {
+            chai.request(server)
+                .post(`/authorization/Test3`)
+                .end((err, response) => {
+                    should.not.exist(err);
+                    should.exist(response);
+                    response.should.have.status(403);
+                    response.body.should.have.property('error').eql(errors.FORBIDDEN);
                     done();
                 });
         });
