@@ -205,7 +205,7 @@ describe('Authorization', () => {
                     done();
                 });
         });
-        it('Requesting creation of new key with invalid scope should fail', (done) => {
+        it('Requesting creation of new key with valid scope should return generated api key', (done) => {
             chai.request(server)
                 .post('/authorization')
                 .send({
@@ -217,6 +217,10 @@ describe('Authorization', () => {
                     response.should.have.status(200);
                     console.log(response.body);
                     response.body.should.have.property('key').to.be.a('string').to.have.lengthOf(16);
+                    response.body.should.have.property('hostname').to.be.a('string').to.eql('evnotify.de');
+                    response.body.should.have.property('quota').to.be.a('number').eql(10000);
+                    // TODO check default features
+                    response.body.should.have.property('features').to.be.an('array');
                     done();
                 });
         });
