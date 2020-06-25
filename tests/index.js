@@ -229,6 +229,7 @@ describe('Authorization', () => {
                     createdAPIKey = response.body.key;
                     response.body.should.have.property('hostname').to.be.a('string').to.eql('*');
                     response.body.should.have.property('quota').to.be.a('number').eql(10000);
+                    response.body.should.have.property('scopes').to.be.an('array').with.lengthOf(1).to.includes('123456');
                     // TODO check default features
                     response.body.should.have.property('features').to.be.an('array');
                     done();
