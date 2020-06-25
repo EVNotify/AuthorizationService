@@ -163,8 +163,12 @@ describe('Authorization', () => {
                 .end((err, response) => {
                     should.not.exist(err);
                     should.exist(response);
-                    response.should.have.status(403);
-                    response.body.should.have.property('error').eql(errors.FORBIDDEN);
+                    response.should.have.status(200);
+                    response.body.should.not.have.property('id');
+                    response.body.should.have.property('key').eql('Test3');
+                    response.body.should.have.property('quota').eql(1);
+                    response.body.should.have.property('usage').eql(0);
+                    response.body.should.have.property('hostname').eql('example.com');
                     done();
                 });
         });
