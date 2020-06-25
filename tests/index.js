@@ -66,6 +66,7 @@ before((done) => {
         await keyModel.create({
             key: 'Test5',
             hostname: '*',
+            scopes: ['123456'],
             features: [{
                 method: 'GET',
                 path: '/authorization'
@@ -264,6 +265,119 @@ describe('Authorization', () => {
                     should.exist(response);
                     response.should.have.status(403);
                     response.body.should.have.property('error').eql(errors.FORBIDDEN);
+                    done();
+                });
+        });
+        it('Use key with valid key and with valid hostname but no referer should fail', (done) => {
+            chai.request(server)
+                .post(`/authorization/${createdAPIKey}`)
+                .end((err, response) => {
+                    should.not.exist(err);
+                    should.exist(response);
+                    response.should.have.status(403);
+                    response.body.should.have.property('error').eql(errors.FORBIDDEN);
+                    done();
+                });
+        });
+        it('Use key with valid key and with valid hostname but invalid referer should fail', (done) => {
+            chai.request(server)
+                .post(`/authorization/${createdAPIKey}`)
+                .set({
+                    referer: {
+                        akey: 'test'
+                    }
+                })
+                .end((err, response) => {
+                    should.not.exist(err);
+                    should.exist(response);
+                    response.should.have.status(403);
+                    response.body.should.have.property('error').eql(errors.FORBIDDEN);
+                    done();
+                });
+        });
+        it('Use key with valid key and with valid hostname with valid referer but invalid scope should fail', (done) => {
+            chai.request(server)
+                .post(`/authorization/${createdAPIKey}`)
+                .set({
+                    referer: {
+                        akey: '654321',
+                        method: 'GET',
+                        path: '/'
+                    }
+                })
+                .end((err, response) => {
+                    should.not.exist(err);
+                    should.exist(response);
+                    response.should.have.status(403);
+                    response.body.should.have.property('error').eql(errors.FORBIDDEN);
+                    done();
+                });
+        });
+        it('Use key with valid key and with valid hostname with valid referer but forbidden action should fail', (done) => {
+            chai.request(server)
+                .post(`/authorization/${createdAPIKey}`)
+                .set({
+                    referer: {
+                        akey: '123456',
+                        method: 'GET',
+                        path: '/'
+                    }
+                })
+                .end((err, response) => {
+                    should.not.exist(err);
+                    should.exist(response);
+                    response.should.have.status(403);
+                    response.body.should.have.property('error').eql(errors.FORBIDDEN);
+                    done();
+                });
+        });
+        it('Use key with valid key and with valid hostname with valid referer and allowed action should succeed', (done) => {
+            chai.request(server)
+                .post(`/authorization/Test5`)
+                .send({
+                    referer: {
+                        akey: '123456',
+                        method: 'GET',
+                        path: '/authorization'
+                    }
+                })
+                .end((err, response) => {
+                    should.not.exist(err);
+                    should.exist(response);
+                    response.should.have.status(200);
+                    response.body.should.have.property('quota').eql(1);
+                    response.body.should.have.property('usage').eql(1);
+                    done();
+                });
+        });
+        it('Check if quota increased afterwards', (done) => {
+            chai.request(server)
+                .get(`/authorization/Test5`)
+                .end((err, response) => {
+                    should.not.exist(err);
+                    should.exist(response);
+                    response.should.have.status(200);
+                    response.body.should.have.property('key').eql('Test5');
+                    response.body.should.have.property('quota').eql(1);
+                    response.body.should.have.property('usage').eql(1);
+                    done();
+                });
+        });
+        it('Use key again should bring quota exceeded', (done) => {
+            chai.request(server)
+                .post(`/authorization/Test5`)
+                .send({
+                    referer: {
+                        akey: '123456',
+                        method: 'GET',
+                        path: '/authorization'
+                    }
+                })
+                .end((err, response) => {
+                    should.not.exist(err);
+                    should.exist(response);
+                    response.should.have.status(429);
+                    response.body.should.have.property('error').eql(errors.QUOTA_EXCEEDED);
                     done();
                 });
         });
