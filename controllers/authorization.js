@@ -11,7 +11,7 @@ const createKey = asyncHandler(async (req, res, next) => {
 
     await KeyModel.create({
         key: randomKey,
-        hostname: 'evnotify.de',
+        hostname: '*',
         quota: 10000,
         scopes: req.body.scopes,
         features: defaultFeatures

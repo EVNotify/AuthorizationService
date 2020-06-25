@@ -7,6 +7,9 @@ const errors = require('../errors.json');
 
 const keyModel = require('../models/Key');
 
+// variables to hold information
+let createdAPIKey;
+
 chai.use(chaiHttp);
 
 before((done) => {
@@ -217,10 +220,26 @@ describe('Authorization', () => {
                     response.should.have.status(200);
                     console.log(response.body);
                     response.body.should.have.property('key').to.be.a('string').to.have.lengthOf(16);
-                    response.body.should.have.property('hostname').to.be.a('string').to.eql('evnotify.de');
+                    createdAPIKey = response.body.key;
+                    response.body.should.have.property('hostname').to.be.a('string').to.eql('*');
                     response.body.should.have.property('quota').to.be.a('number').eql(10000);
                     // TODO check default features
                     response.body.should.have.property('features').to.be.an('array');
+                    done();
+                });
+        });
+        it('Check if new api key was created successfully', (done) => {
+            chai.request(server)
+                .get(`/authorization/${createdAPIKey}`)
+                .end((err, response) => {
+                    should.not.exist(err);
+                    should.exist(response);
+                    response.should.have.status(200);
+                    response.body.should.not.have.property('id');
+                    response.body.should.have.property('key').eql(createdAPIKey);
+                    response.body.should.have.property('quota').eql(10000);
+                    response.body.should.have.property('usage').eql(0);
+                    response.body.should.have.property('hostname').eql('*');
                     done();
                 });
         });
