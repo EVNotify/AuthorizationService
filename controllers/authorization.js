@@ -29,7 +29,6 @@ const getKey = asyncHandler(async (req, res, next) => {
     }).select(['-_id']);
 
     if (!key) return next(errors.UNKNOWN_KEY);
-    if (key.hostname !== '*' && key.hostname !== req.hostname.toLowerCase()) return next(errors.FORBIDDEN);
     res.json(key);
 });
 

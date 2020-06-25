@@ -157,7 +157,7 @@ describe('Authorization', () => {
                     done();
                 });
         });
-        it('Requesting with different hostname key should not return info', (done) => {
+        it('Requesting with different hostname key should still return info', (done) => {
             chai.request(server)
                 .get('/authorization/Test3')
                 .end((err, response) => {
