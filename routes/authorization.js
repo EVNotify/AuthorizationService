@@ -6,7 +6,7 @@ const keyUtils = require('@evnotify/utils').key;
 const authorizationController = require('../controllers/authorization');
 
 const attachKey = (req, _res, next) => {
-    req.authKey = req.params.key || keyUtils.extractKey(req);
+    req.authKey = ((req.params.key || keyUtils.extractKey(req)) || '').replace('Bearer', '').trim();
     next();
 };
 

@@ -386,5 +386,23 @@ describe('Authorization', () => {
                     done();
                 });
         });
+        it('Use valid combination again, but with Bearer as String within Parameter, should still succeed, instead of not finding', (done) => {
+            chai.request(server)
+                .post(`/authorization/Bearer Test5`)
+                .send({
+                    referer: {
+                        akey: '123456',
+                        method: 'GET',
+                        path: '/authorization'
+                    }
+                })
+                .end((err, response) => {
+                    should.not.exist(err);
+                    should.exist(response);
+                    response.should.have.status(429);
+                    response.body.should.have.property('error').eql(errors.QUOTA_EXCEEDED);
+                    done();
+                });
+        });
     });
 });
