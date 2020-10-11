@@ -56,6 +56,7 @@ router.get('/:key', attachKey, authorizationController.getKey);
  * 
  * @apiDescription In order to be able to communicate with the API you need a valid API key.
  * To obtain a default API key, you can use this function. However, for custom API quota, specific roles / features, a manual contact is required (info<at>evnotify.de).
+ * Note: This request is used internally and called automatically when you register (that's how you get your own API Key) and is not intend for the usage outside.
  * 
  * @apiParam  {String[]} scopes the AKey list where API key should be used for
  * 
