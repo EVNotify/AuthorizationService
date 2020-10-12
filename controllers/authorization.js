@@ -44,11 +44,10 @@ const useKey = asyncHandler(async (req, res, next) => {
     const features = Array.isArray(key.features) ? key.features : [];
     const scopes = Array.isArray(key.scopes) ? key.scopes : [];
 
-    console.info('Use key', req.body.referer);
-    if (req.body.referer == null || typeof req.body.referer.method !== 'string' || typeof req.body.referer.path !== 'string' || typeof req.body.referer.akey !== 'string') return next(errors.FORBIDDEN);
-    if (!scopes.includes(req.body.referer.akey)) return next(errors.FORBIDDEN);
+    if (req.body.referer == null || typeof req.body.referer.method !== 'string' || typeof req.body.referer.path !== 'string') return next(errors.FORBIDDEN);
     // check if dynamic URL parameters have been passed to the parsed request URL
     if (req.body.referer.params != null && typeof req.body.referer.params === 'object' && Object.keys(req.body.referer.params).length) {
+        if (!scopes.includes(req.body.referer.akey)) return next(errors.FORBIDDEN);
         if (!(features.some((feature) => {
             if (feature.method !== req.body.referer.method) return;
             const validParts = [];
