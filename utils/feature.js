@@ -9,6 +9,9 @@ const defaultFeatures = () => {
     }, {
         method: 'POST',
         path: '/authorization/:key'
+    }, {
+        method: 'GET',
+        path: '/settings/:akey'
     }];
 };
 
