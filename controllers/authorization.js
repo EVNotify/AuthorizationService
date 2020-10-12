@@ -73,10 +73,16 @@ const useKey = asyncHandler(async (req, res, next) => {
             });
 
             return validParts.length === originalParts.length;
-        }))) return next(errors.FORBIDDEN);
+        }))) {
+            console.error(`Forbidden action called: [${req.body.referer.method}] ${req.body.referer.path}`);
+            return next(errors.FORBIDDEN);
+        }
     } else {
         // check if feature is allowed
-        if (!(features.some((feature) => feature.path === req.body.referer.path && feature.method === req.body.referer.method))) return next(errors.FORBIDDEN);
+        if (!(features.some((feature) => feature.path === req.body.referer.path && feature.method === req.body.referer.method))) {
+            console.error(`Forbidden action called: [${req.body.referer.method}] ${req.body.referer.path}`);
+            return next(errors.FORBIDDEN);
+        }
     }
 
     // quota / usage
