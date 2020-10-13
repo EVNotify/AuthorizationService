@@ -12,6 +12,12 @@ const defaultFeatures = () => {
     }, {
         method: 'GET',
         path: '/settings/:akey'
+    }, {
+        method: 'PATCH',
+        path: '/settings/:akey'
+    }, {
+        method: 'DELETE',
+        path: '/settings/:akey'
     }];
 };
 
