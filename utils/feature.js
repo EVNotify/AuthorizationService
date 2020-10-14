@@ -18,6 +18,27 @@ const defaultFeatures = () => {
     }, {
         method: 'DELETE',
         path: '/settings/:akey'
+    }, {
+        method: 'GET',
+        path: '/sync/:akey'
+    }, {
+        method: 'POST',
+        path: '/sync/:akey'
+    }, {
+        method: 'POST',
+        path: '/logs/latest'
+    }, {
+        method: 'GET',
+        path: '/logs'
+    }, {
+        method: 'GET',
+        path: '/logs/:id'
+    }, {
+        method: 'GET',
+        path: '/logs/latest'
+    }, {
+        method: 'GET',
+        path: '/logs/current'
     }];
 };
 
