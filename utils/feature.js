@@ -26,19 +26,19 @@ const defaultFeatures = () => {
         path: '/sync/:akey'
     }, {
         method: 'POST',
-        path: '/logs/latest'
+        path: '/logs/:akey/latest'
     }, {
         method: 'GET',
-        path: '/logs'
+        path: '/logs/:akey'
     }, {
         method: 'GET',
-        path: '/logs/:id'
+        path: '/logs/:akey/:id'
     }, {
         method: 'GET',
-        path: '/logs/latest'
+        path: '/logs/:akey/latest'
     }, {
         method: 'GET',
-        path: '/logs/current'
+        path: '/logs/:akey/current'
     }];
 };
 
